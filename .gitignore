@@ -1,0 +1,21 @@
+# Скомпилированные бинарники
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+twist-karaoke
+
+# Тестовые файлы
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+# IDE
+.idea/
+.vscode/
+*.swp
