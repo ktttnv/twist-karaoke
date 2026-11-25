@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
-	"os/signal"
-	"time"
 
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/ktttnv/twist-karaoke/internal/audio"
+	"github.com/ktttnv/twist-karaoke/internal/game"
 )
 
 func main() {
@@ -17,21 +18,12 @@ func main() {
 	}
 	defer capture.Stop()
 
-	fmt.Println("🎤 Микрофон запущен. Говорите/пойте! Ctrl+C для выхода.")
+	g := game.New(capture)
 
-	ticker := time.NewTicker(100 * time.Millisecond)
-	defer ticker.Stop()
+	ebiten.SetWindowSize(800, 600)
+	ebiten.SetWindowTitle("Твист караоке - Индикатор громкости")
 
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt)
-
-	for {
-		select {
-		case <-ticker.C:
-			fmt.Printf("\rГромкость (RMS): %.4f", capture.RMS())
-		case <-stop:
-			fmt.Println("\nВыход.")
-			return
-		}
+	if err := ebiten.RunGame(g); err != nil {
+		log.Fatal(err)
 	}
 }

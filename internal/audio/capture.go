@@ -12,6 +12,7 @@ type Capture struct {
 	ctx    *malgo.AllocatedContext
 	device *malgo.Device
 	rms    atomic.Uint32
+	smooth atomic.Uint32
 }
 
 func NewCapture() (*Capture, error) {
@@ -39,10 +40,16 @@ func NewCapture() (*Capture, error) {
 			sum += f * f
 		}
 		numSamples := len(in) / 2
-		if numSamples > 0 {
-			rms := math.Sqrt(sum / float64(numSamples))
-			c.rms.Store(math.Float32bits(float32(rms)))
+		if numSamples == 0 {
+			return
 		}
+		raw := math.Sqrt(sum / float64(numSamples))
+		c.rms.Store(math.Float32bits(float32(raw)))
+
+		const alpha = 0.2
+		prev := math.Float32frombits(c.smooth.Load())
+		smoothed := alpha*float32(raw) + (1-alpha)*prev
+		c.smooth.Store(math.Float32bits(smoothed))
 	}
 
 	device, err := malgo.InitDevice(ctx.Context, deviceConfig, malgo.DeviceCallbacks{
@@ -67,6 +74,10 @@ func NewCapture() (*Capture, error) {
 
 func (c *Capture) RMS() float32 {
 	return math.Float32frombits(c.rms.Load())
+}
+
+func (c *Capture) SmoothedRMS() float32 {
+	return math.Float32frombits(c.smooth.Load())
 }
 
 func (c *Capture) Stop() {
