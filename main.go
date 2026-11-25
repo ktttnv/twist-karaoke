@@ -21,7 +21,7 @@ func main() {
 	g := game.New(capture)
 
 	ebiten.SetWindowSize(800, 600)
-	ebiten.SetWindowTitle("Твист караоке - Индикатор громкости")
+	ebiten.SetWindowTitle("Твист караоке")
 
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
