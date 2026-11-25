@@ -17,6 +17,7 @@ type Capture struct {
 
 func NewCapture() (*Capture, error) {
 	ctx, err := malgo.InitContext(nil, malgo.ContextConfig{}, nil)
+
 	if err != nil {
 		return nil, fmt.Errorf("init context: %w", err)
 	}
